@@ -1,0 +1,61 @@
+html {
+    box-sizing: border-box;
+    overflow: scroll;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+body {
+    margin: 0;
+    background: #fafafa;
+    padding-top: 40px;
+}
+
+.api-content {
+    font-size: 16px;
+}
+
+.api-content h1, .api-content h2 {
+    font-size: 36px;
+    font-weight: 600;
+    color: #171f93;
+}
+
+.api-content h3 {
+    font-size: 24px;
+    color: #657694;
+}
+
+
+nav {
+    display: inline-block;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+#links_container {
+    margin: 0;
+    padding: 0;
+    background-color: #0033a0;
+}
+
+#links_container li {
+    display: inline-block;
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+.alert-block {
+    padding: 1rem;
+    background-color: #f44336;
+    color: white;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+}

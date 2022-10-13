@@ -1,10 +1,12 @@
-package gin
+package server
 
 import (
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/atcheri/hexarch-go/docs"
 )
 
 //// GinApp will implement the Server interface
@@ -16,6 +18,7 @@ func NewGinApp() *gin.Engine {
 		time.Sleep(5 * time.Second)
 		c.String(http.StatusOK, "Welcome Gin Server")
 	})
+	app.StaticFS("/api/docs", http.FS(docs.Swagger))
 
 	return app
 }

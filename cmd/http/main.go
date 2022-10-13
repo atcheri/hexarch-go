@@ -21,7 +21,7 @@ func init() {
 }
 
 func main() {
-	app := gin.NewGinApp()
+	app := server.NewGinApp()
 	srv := &http.Server{
 		Addr:              ":8080",
 		Handler:           app,

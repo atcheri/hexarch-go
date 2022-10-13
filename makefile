@@ -1,4 +1,4 @@
-.PHONY: build run cli lint test
+.PHONY: build run cli lint test codegen
 
 dependencies:
 	go mod download
@@ -19,3 +19,8 @@ lint:
 
 test:
 	go test -v ./internal/...
+
+codegen:
+	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.9.1
+	oapi-codegen -generate types -package dto ./docs/openapi.yaml > ./internal/core/dtos/api_dtos.gen.go
+	oapi-codegen -generate spec -package http ./docs/openapi.yaml > ./internal/core/http/http_spec.gen.go

@@ -1,0 +1,182 @@
+openapi: 3.1.0
+
+info:
+  version: "0.1"
+  title: Cutting edge localization Service API
+  description: |
+    Enter here a whole verbose description of the API in markdown format
+    # Introduction
+    Lorem ipsume
+    # Some Definitions
+    Lorem ipsume
+  contact:
+    name: Out Team name
+    email: team@email.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  x-logo:
+    url: /api/docs/assets/translate-logo.png
+    altText: Translation app logo
+  tags:
+    - name: tag-1
+      description: |
+        Markdown description of the tag
+    - name: tag-2
+      description: |
+        Markdown description of the tag
+    - name: tag-3
+      description: |
+        Markdown description of the tag
+  x-tagGroups:
+    - name: Group 1
+      tags:
+        - tag-1
+    - name: Group 2
+      tags:
+        - tag-1
+        - tag-2
+    - name: Group 3
+      tags:
+        - tag-3
+
+paths:
+  /api/words:
+    get:
+      description: Retrieves a list of words
+      operationId: getWords
+      parameters:
+        - $ref: '#/components/parameters/GetWordSearchParam'
+      responses:
+        "200":
+          $ref: '#/components/responses/WordsGetResponse'
+#        "401":
+#          $ref: '#/components/responses/Unauthorized'
+#        "403":
+#          $ref: '#/components/responses/Forbidden'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+      summary: Get all words (that the user owns ?)
+      tags:
+        - tag-1
+    post:
+      description: Creates a new word.
+      operationId: postWord
+      requestBody:
+        content:
+          application/json:
+            example:
+              key: abcd
+              content: A-b-C-D
+            schema:
+              $ref: '#/components/schemas/WordsPostRequestBody'
+        description: Required data to create an word
+      responses:
+        "200":
+          $ref: '#/components/responses/WordsPostResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+#        "403":
+#          $ref: '#/components/responses/Forbidden'
+        "409":
+          $ref: '#/components/responses/Conflict'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+      summary: Create a new word
+      tags:
+        - tag-1
+
+components:
+  parameters:
+    GetWordSearchParam:
+      description: Parameter used to search for a word.
+      example:
+      in: query
+      name: q
+      required: false
+      schema:
+        description: Rules for the search query parameter
+        #        maxLength: 10
+        #        minLength: 3
+        #        pattern: ^[a-z0-9_\-]+$
+        type: string
+  responses:
+    WordsGetResponse:
+      description: GET words response.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - words
+            properties:
+              words:
+                description: The list of words
+                type: array
+                items:
+                  $ref: "#/components/schemas/WordDTO"
+    WordsPostResponse:
+      description: POST words response.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                description: The id of the created word
+                type: string
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: BadRequest. Returned when the payload is invalid.
+    Conflict:
+      description: Conflict. Returned when resource cannot be created because of business rules violation.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    WordsPostRequestBody:
+      $ref: "#/components/schemas/WordDTO"
+    WordDTO:
+      type: object
+      required:
+        - key
+        - content
+      properties:
+        key:
+          type: string
+          maxLength: 20
+          minLength: 1
+        content:
+          type: string
+          maxLength: 50
+          minLength: 1
+    Error:
+      description: Standard Error response.
+      type: object
+      required:
+        - error_type
+        - name
+        - message
+      properties:
+        error_type:
+          type: string
+          description: "example: `UNAUTHORIZED`."
+        name:
+          type: string
+          description: Error name.
+        message:
+          type: string
+          description: The detailed reason of the error.
+#  securitySchemes:
