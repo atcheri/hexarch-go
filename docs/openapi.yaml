@@ -43,7 +43,8 @@ info:
 paths:
   /api/words:
     get:
-      description: Retrieves a list of words
+      summary: Retrieves a list of words.
+      description: Get all words (that the user owns ?).
       operationId: getWords
       parameters:
         - $ref: '#/components/parameters/GetWordSearchParam'
@@ -58,11 +59,11 @@ paths:
 #          $ref: '#/components/responses/Forbidden'
         "500":
           $ref: '#/components/responses/InternalServerError'
-      summary: Get all words (that the user owns ?)
       tags:
         - tag-1
     post:
-      description: Creates a new word.
+      summary: Create a new word.
+      description: Creates a new word with a key and a content.
       operationId: postWord
       requestBody:
         content:
@@ -72,7 +73,7 @@ paths:
               content: A-b-C-D
             schema:
               $ref: '#/components/schemas/WordsPostRequestBody'
-        description: Required data to create an word
+        description: Required data to create a word
       responses:
         "200":
           $ref: '#/components/responses/WordsPostResponse'
@@ -84,10 +85,57 @@ paths:
           $ref: '#/components/responses/Conflict'
         "500":
           $ref: '#/components/responses/InternalServerError'
-      summary: Create a new word
       tags:
         - tag-1
-
+    put:
+      description: Edit an existing word.
+      summary: Edit a word.
+      operationId: putWord
+      requestBody:
+        content:
+          application/json:
+            example:
+              key: abcd
+              content: D-C-b-a
+            schema:
+              $ref: '#/components/schemas/WordsPutRequestBody'
+        description: Required data to edit a word
+      responses:
+        "200":
+          $ref: '#/components/responses/WordsPutResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "409":
+          $ref: '#/components/responses/Conflict'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - tag-1
+    delete:
+      summary: Delete a word.
+      description: Delete an existing word.
+      operationId: deleteWord
+      requestBody:
+        content:
+          application/json:
+            example:
+              key: abcd
+            schema:
+              $ref: '#/components/schemas/WordsDeleteRequestBody'
+        description: Required data to delete a word
+      responses:
+        "200":
+          $ref: '#/components/responses/WordsDeleteResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        #        "403":
+        #          $ref: '#/components/responses/Forbidden'
+        "409":
+          $ref: '#/components/responses/Conflict'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - tag-1
 components:
   parameters:
     GetWordSearchParam:
@@ -150,6 +198,30 @@ components:
               id:
                 description: The id of the created word
                 type: string
+    WordsPutResponse:
+      description: PUT words response.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                description: The id of the updated word
+                type: string
+    WordsDeleteResponse:
+      description: DELETE words response.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - success
+            properties:
+              success:
+                description: Contains the successful message of word deletion
+                type: string
     BadRequest:
       content:
         application/json:
@@ -171,6 +243,17 @@ components:
   schemas:
     WordsPostRequestBody:
       $ref: "#/components/schemas/WordDTO"
+    WordsPutRequestBody:
+      $ref: "#/components/schemas/WordDTO"
+    WordsDeleteRequestBody:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+          maxLength: 20
+          minLength: 1
     WordDTO:
       type: object
       required:

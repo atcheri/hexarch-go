@@ -21,8 +21,16 @@ type WordDTO struct {
 	Key     string `json:"key"`
 }
 
+// WordsDeleteRequestBody defines model for WordsDeleteRequestBody.
+type WordsDeleteRequestBody struct {
+	Key string `json:"key"`
+}
+
 // WordsPostRequestBody defines model for WordsPostRequestBody.
 type WordsPostRequestBody WordDTO
+
+// WordsPutRequestBody defines model for WordsPutRequestBody.
+type WordsPutRequestBody WordDTO
 
 // GetWordLimitParam defines model for GetWordLimitParam.
 type GetWordLimitParam int
@@ -42,10 +50,16 @@ type Conflict Error
 // Standard Error response.
 type InternalServerError Error
 
+// WordsDeleteResponse defines model for WordsDeleteResponse.
+type WordsDeleteResponse struct {
+	// Contains the successful message of word deletion
+	Success string `json:"success"`
+}
+
 // WordsGetResponse defines model for WordsGetResponse.
 type WordsGetResponse struct {
 	// The total amount of records
-	Cout *int `json:"cout,omitempty"`
+	Count int `json:"count"`
 
 	// The list of words
 	Words []WordDTO `json:"words"`
@@ -56,6 +70,15 @@ type WordsPostResponse struct {
 	// The id of the created word
 	Id string `json:"id"`
 }
+
+// WordsPutResponse defines model for WordsPutResponse.
+type WordsPutResponse struct {
+	// The id of the updated word
+	Id string `json:"id"`
+}
+
+// DeleteWordJSONBody defines parameters for DeleteWord.
+type DeleteWordJSONBody WordsDeleteRequestBody
 
 // GetWordsParams defines parameters for GetWords.
 type GetWordsParams struct {
@@ -72,5 +95,14 @@ type GetWordsParams struct {
 // PostWordJSONBody defines parameters for PostWord.
 type PostWordJSONBody WordsPostRequestBody
 
+// PutWordJSONBody defines parameters for PutWord.
+type PutWordJSONBody WordsPutRequestBody
+
+// DeleteWordJSONRequestBody defines body for DeleteWord for application/json ContentType.
+type DeleteWordJSONRequestBody DeleteWordJSONBody
+
 // PostWordJSONRequestBody defines body for PostWord for application/json ContentType.
 type PostWordJSONRequestBody PostWordJSONBody
+
+// PutWordJSONRequestBody defines body for PutWord for application/json ContentType.
+type PutWordJSONRequestBody PutWordJSONBody

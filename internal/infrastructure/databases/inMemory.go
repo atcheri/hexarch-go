@@ -1,6 +1,10 @@
 package databases
 
-import "golang.org/x/exp/maps"
+import (
+	"fmt"
+
+	"golang.org/x/exp/maps"
+)
 
 type InMemoryDB struct {
 	words, sentences map[string]string
@@ -22,14 +26,18 @@ func (db *InMemoryDB) GetWords(offset, limit int) []string {
 	return maps.Values(db.words)
 }
 
-func (db *InMemoryDB) GetWordByKey(key string) string {
+func (db *InMemoryDB) GetWordByKey(key string) (string, error) {
 	if w, ok := db.words[key]; ok {
-		return w
+		return w, nil
 	}
 
-	return ""
+	return "", fmt.Errorf("word not for for key %s", key)
 }
 
 func (db *InMemoryDB) AddWord(key, content string) {
 	db.words[key] = content
+}
+
+func (db *InMemoryDB) RemoveWord(key string) {
+	delete(db.words, key)
 }
