@@ -47,6 +47,8 @@ paths:
       operationId: getWords
       parameters:
         - $ref: '#/components/parameters/GetWordSearchParam'
+        - $ref: '#/components/parameters/GetWordOffsetParam'
+        - $ref: '#/components/parameters/GetWordLimitParam'
       responses:
         "200":
           $ref: '#/components/responses/WordsGetResponse'
@@ -89,7 +91,8 @@ paths:
 components:
   parameters:
     GetWordSearchParam:
-      description: Parameter used to search for a word.
+      description: |
+        Parameter used to search for a word.
       example:
       in: query
       name: q
@@ -100,6 +103,22 @@ components:
         #        minLength: 3
         #        pattern: ^[a-z0-9_\-]+$
         type: string
+    GetWordOffsetParam:
+      description: |
+        Offset pagination parameter. Starts from 0
+      in: query
+      name: offset
+      required: true
+      schema:
+        type: integer
+    GetWordLimitParam:
+      description: |
+        Limit pagination parameter. Starts from 5
+      in: query
+      name: limit
+      required: true
+      schema:
+        type: integer
   responses:
     WordsGetResponse:
       description: GET words response.
@@ -109,12 +128,16 @@ components:
             type: object
             required:
               - words
+              - count
             properties:
               words:
                 description: The list of words
                 type: array
                 items:
                   $ref: "#/components/schemas/WordDTO"
+              count:
+                description: The total amount of records
+                type: integer
     WordsPostResponse:
       description: POST words response.
       content:

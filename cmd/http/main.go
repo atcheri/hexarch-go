@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/atcheri/hexarch-go/internal/core/adapters/right/repositories"
+	"github.com/atcheri/hexarch-go/internal/infrastructure/databases"
 	"github.com/atcheri/hexarch-go/internal/infrastructure/http-server/gin"
 )
 
@@ -21,7 +23,11 @@ func init() {
 }
 
 func main() {
-	app := server.NewGinApp()
+	db := databases.NewInMemoryDB()
+	wordsRepo := adapters.NewInMemoryWords(db)
+	sentencesRepo := adapters.NewInMemorySentences(db)
+
+	app := server.NewGinApp(wordsRepo, sentencesRepo)
 	srv := &http.Server{
 		Addr:              ":8080",
 		Handler:           app,
