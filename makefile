@@ -1,4 +1,4 @@
-.PHONY: build run cli lint test codegen
+.PHONY: build run build-cli lint test codegen
 
 dependencies:
 	go mod download
