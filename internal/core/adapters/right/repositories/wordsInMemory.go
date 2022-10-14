@@ -16,10 +16,10 @@ func NewInMemoryWords(db *databases.InMemoryDB) ports.WordsRepository {
 }
 
 func (i inMemoryWords) GetAll(offset, limit int) []string {
-	return i.db.GetWords(offset, limit)
+	return i.db.GetWordsInString(offset, limit)
 }
 
-func (i inMemoryWords) GetByKey(key string) string {
+func (i inMemoryWords) GetByKey(_ string) string {
 	//TODO implement me
 	panic("implement me")
 }

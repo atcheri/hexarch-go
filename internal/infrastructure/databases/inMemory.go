@@ -17,7 +17,7 @@ func NewInMemoryDB() *InMemoryDB {
 	words["middle_name"] = "Deuxième prénom"
 	words["lastName"] = "Nom de famille"
 	words["gender"] = "Sexe"
-	words["bitrhday"] = "Date de naissance"
+	words["birthday"] = "Date de naissance"
 	words["title"] = "Titre"
 	words["height"] = "Taille"
 	sentences := make(map[string]string, 0)
@@ -27,7 +27,25 @@ func NewInMemoryDB() *InMemoryDB {
 	}
 }
 
-func (db *InMemoryDB) GetWords(offset, limit int) []string {
+func (db *InMemoryDB) GetWords(offset, limit int) map[string]string {
+	words := make(map[string]string)
+	i := 0
+	for key, word := range db.words {
+		if i < offset {
+			i++
+			continue
+		}
+		if i == offset+limit {
+			break
+		}
+
+		words[key] = word
+		i++
+	}
+	return words
+}
+
+func (db *InMemoryDB) GetWordsInString(offset, limit int) []string {
 	return maps.Values(db.words)[offset:limit]
 }
 
