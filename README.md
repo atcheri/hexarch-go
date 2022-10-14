@@ -80,6 +80,29 @@ $ docker-compose up
 $ make build-cli
 ```
 
+Example of a cli command:
+```shell
+$ go run cmd/cli/main.go list words
+$ go run cmd/cli/main.go list words --offset=0 --limit=3
+```
+The should display something like this ⬇️
+```shell
++---+-------------+-------------------+
+| # |     KEY     |      CONTENT      |
++---+-------------+-------------------+
+| 1 | title       | Titre             |
+| 2 | height      | Taille            |
+| 3 | firstName   | Prénom            |
+| 4 | middle_name | Deuxième prénom   |
+| 5 | lastName    | Nom de famille    |
+| 6 | gender      | Sexe              |
+| 7 | bitrhday    | Date de naissance |
++---+-------------+-------------------+
+|       Fetched 7 words from DB       |
++---+-------------+-------------------+
+
+```
+
 ### Layout
 
 ```tree
