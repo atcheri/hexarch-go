@@ -11,8 +11,10 @@ build:
 run:
 	go run cmd/http/main.go
 
-cli:
-	go run cmd/cli/main.go
+build-cli:
+	go build \
+		-o ./out/cli \
+		cmd/cli/main.go
 
 lint:
 	golangci-lint run --issues-exit-code 0 --out-format code-climate | jq -c '.[] | select(.severity|contains("major"))'

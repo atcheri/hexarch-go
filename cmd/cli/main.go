@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
+	cli "github.com/atcheri/hexarch-go/internal/infrastructure/cli/cobra"
 )
 
 func main() {
-	fmt.Println("===== BEGIN cli main function =====")
-	fmt.Println("IMPLEMENT a cli that could expose the use cases")
-	fmt.Println("===== END cli main function =====")
+	cli.Execute()
 }

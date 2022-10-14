@@ -14,7 +14,12 @@ type InMemoryDB struct {
 func NewInMemoryDB() *InMemoryDB {
 	words := make(map[string]string, 0)
 	words["firstName"] = "Prénom"
+	words["middle_name"] = "Deuxième prénom"
 	words["lastName"] = "Nom de famille"
+	words["gender"] = "Sexe"
+	words["bitrhday"] = "Date de naissance"
+	words["title"] = "Titre"
+	words["height"] = "Taille"
 	sentences := make(map[string]string, 0)
 	return &InMemoryDB{
 		words:     words,
@@ -23,7 +28,7 @@ func NewInMemoryDB() *InMemoryDB {
 }
 
 func (db *InMemoryDB) GetWords(offset, limit int) []string {
-	return maps.Values(db.words)
+	return maps.Values(db.words)[offset:limit]
 }
 
 func (db *InMemoryDB) GetWordByKey(key string) (string, error) {
