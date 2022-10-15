@@ -16,9 +16,15 @@ import (
 	server "github.com/atcheri/hexarch-go/internal/infrastructure/http-server/gin"
 )
 
+var (
+	port = "8080"
+)
+
 func init() {
 	fmt.Println("===== BEGIN init function =====")
-	fmt.Println("We could do some flag parsing here for example: -db=mysql, or -ports=8080 etc...")
+	if p := os.Getenv("PORT"); p != "" {
+		port = p
+	}
 	fmt.Println("===== END init function =====")
 }
 
@@ -31,7 +37,7 @@ func main() {
 
 	app := server.NewGinApp(wordsController, sentencesRepo)
 	srv := &http.Server{
-		Addr:              ":8080",
+		Addr:              fmt.Sprintf(":%s", port),
 		Handler:           app,
 		ReadHeaderTimeout: 15 * time.Second,
 		WriteTimeout:      15 * time.Second,
@@ -40,6 +46,7 @@ func main() {
 	// Initializing the http-server in a goroutine so that
 	// it won't block the graceful shutdown handling below
 	go func() {
+		fmt.Printf("Server running and listening on port: %s\n", port)
 		if err := srv.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
 			log.Printf("listen: %s\n", err)
 		}
