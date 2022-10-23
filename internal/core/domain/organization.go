@@ -1,5 +1,6 @@
 package domain
 
+// Organization is
 type Organization struct {
-	Projects
+	projects []Project
 }

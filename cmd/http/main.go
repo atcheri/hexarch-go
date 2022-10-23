@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	adapters "github.com/atcheri/hexarch-go/internal/core/adapters/right/repositories"
+	"github.com/atcheri/hexarch-go/internal/core/adapters/right/repositories/inMemory"
 	"github.com/atcheri/hexarch-go/internal/infrastructure/databases"
 	server "github.com/atcheri/hexarch-go/internal/infrastructure/http-server/gin"
 )
@@ -29,13 +29,14 @@ func init() {
 }
 
 func main() {
+	// Initializing the DB
 	db := databases.NewInMemoryDB()
-	wordsRepo := adapters.NewInMemoryWords(db)
-	sentencesRepo := adapters.NewInMemorySentences(db)
 
-	wordsController := server.NewWordsController(wordsRepo)
+	// Initializing repositories
+	translationsRepo := inMemory.NewInMemoryTranslations(db)
 
-	app := server.NewGinApp(wordsController, sentencesRepo)
+	app := server.NewGinApp(server.NewAppControllers(server.AppControllersDependencies{TranslationsRepo: translationsRepo}))
+
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%s", port),
 		Handler:           app,

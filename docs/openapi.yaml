@@ -19,215 +19,117 @@ info:
     url: /api/docs/assets/translate-logo.png
     altText: Translation app logo
   tags:
-    - name: tag-1
+    - name: organization
       description: |
-        Markdown description of the tag
-    - name: tag-2
+        Markdown description of the organization tag
+    - name: project
       description: |
-        Markdown description of the tag
-    - name: tag-3
+        Markdown description of the project tag
+    - name: Translation
       description: |
-        Markdown description of the tag
+        Markdown description of the translation tag
   x-tagGroups:
     - name: Group 1
       tags:
-        - tag-1
-    - name: Group 2
-      tags:
-        - tag-1
-        - tag-2
-    - name: Group 3
-      tags:
-        - tag-3
+        - Translation
 
 paths:
-  /api/words:
+  /api/translations/{projectName}:
     get:
-      summary: Retrieves a list of words.
-      description: Get all words (that the user owns ?).
-      operationId: getWords
+      summary: Project translations
+      description: |
+        This endpoint allows you to get all the translations for a given Project.<br>
+        You can also filter by specifying only the languages that you want.
+      operationId: getSomething
       parameters:
-        - $ref: '#/components/parameters/GetWordSearchParam'
-        - $ref: '#/components/parameters/GetWordOffsetParam'
-        - $ref: '#/components/parameters/GetWordLimitParam'
+        - $ref: "#/components/parameters/ProjectNameParam"
+        - $ref: "#/components/parameters/GetProjectTranslationsLanguagesParam"
       responses:
-        "200":
-          $ref: '#/components/responses/WordsGetResponse'
-#        "401":
-#          $ref: '#/components/responses/Unauthorized'
-#        "403":
-#          $ref: '#/components/responses/Forbidden'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
+        200:
+          $ref: "#/components/responses/ProjectTranslationsGetResponse"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/InternalServerError"
       tags:
-        - tag-1
-    post:
-      summary: Create a new word.
-      description: Creates a new word with a key and a content.
-      operationId: postWord
-      requestBody:
-        content:
-          application/json:
-            example:
-              key: abcd
-              content: A-b-C-D
-            schema:
-              $ref: '#/components/schemas/WordsPostRequestBody'
-        description: Required data to create a word
-      responses:
-        "200":
-          $ref: '#/components/responses/WordsPostResponse'
-        "400":
-          $ref: '#/components/responses/BadRequest'
-#        "403":
-#          $ref: '#/components/responses/Forbidden'
-        "409":
-          $ref: '#/components/responses/Conflict'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-      tags:
-        - tag-1
-    put:
-      description: Edit an existing word.
-      summary: Edit a word.
-      operationId: putWord
-      requestBody:
-        content:
-          application/json:
-            example:
-              key: abcd
-              content: D-C-b-a
-            schema:
-              $ref: '#/components/schemas/WordsPutRequestBody'
-        description: Required data to edit a word
-      responses:
-        "200":
-          $ref: '#/components/responses/WordsPutResponse'
-        "400":
-          $ref: '#/components/responses/BadRequest'
-        "409":
-          $ref: '#/components/responses/Conflict'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-      tags:
-        - tag-1
-    delete:
-      summary: Delete a word.
-      description: Delete an existing word.
-      operationId: deleteWord
-      requestBody:
-        content:
-          application/json:
-            example:
-              key: abcd
-            schema:
-              $ref: '#/components/schemas/WordsDeleteRequestBody'
-        description: Required data to delete a word
-      responses:
-        "200":
-          $ref: '#/components/responses/WordsDeleteResponse'
-        "400":
-          $ref: '#/components/responses/BadRequest'
-        #        "403":
-        #          $ref: '#/components/responses/Forbidden'
-        "409":
-          $ref: '#/components/responses/Conflict'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-      tags:
-        - tag-1
+        - Translation
+
 components:
   parameters:
-    GetWordSearchParam:
-      description: |
-        Parameter used to search for a word.
+    ProjectNameParam:
+      name: projectName
+      description: The name of the project.
+      in: path
+      required: true
+      schema:
+        type: string
       example:
+        - traduction-project-1
+    GetProjectTranslationsLanguagesParam:
+      name: languages
+      description: A list of Language codes
       in: query
-      name: q
       required: false
       schema:
-        description: Rules for the search query parameter
-        #        maxLength: 10
-        #        minLength: 3
-        #        pattern: ^[a-z0-9_\-]+$
-        type: string
-    GetWordOffsetParam:
-      description: |
-        Offset pagination parameter. Starts from 0
-      in: query
-      name: offset
-      required: true
-      schema:
-        type: integer
-    GetWordLimitParam:
-      description: |
-        Limit pagination parameter. Starts from 5
-      in: query
-      name: limit
-      required: true
-      schema:
-        type: integer
+        type: array
+        items:
+          type: string
+      example: |
+        For English and French, use [ en, fr ] - Or for  Portugese, German and Spanish, use [ pt, de, es ]
   responses:
-    WordsGetResponse:
-      description: GET words response.
+    ProjectTranslationsGetResponse:
+      description: Get translations for a given project
       content:
         application/json:
           schema:
             type: object
             required:
-              - words
-              - count
+              - translations
+              - total
             properties:
-              words:
-                description: The list of words
+              translations:
+                description: The list of translations
                 type: array
                 items:
-                  $ref: "#/components/schemas/WordDTO"
-              count:
-                description: The total amount of records
+                  $ref: "#/components/schemas/TranslationKeyDTO"
+              total:
+                description: The total amount of translations
                 type: integer
-    WordsPostResponse:
-      description: POST words response.
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - id
-            properties:
-              id:
-                description: The id of the created word
-                type: string
-    WordsPutResponse:
-      description: PUT words response.
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - id
-            properties:
-              id:
-                description: The id of the updated word
-                type: string
-    WordsDeleteResponse:
-      description: DELETE words response.
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - success
-            properties:
-              success:
-                description: Contains the successful message of word deletion
-                type: string
+          examples:
+            Successful response:
+              value:
+                translations:
+                  - key: home
+                    languages:
+                      - code: en
+                        text: home
+                      - code: pt
+                        text: casa
+                  - key: contact
+                    languages:
+                      - code: en
+                        tect: contact
+                      - code: pt
+                        tect: contato
+                  - key: about us
+                    languages:
+                      - code: en
+                        tect: about us
+                      - code: pt
+                        tect: sobre nós
+                total: 3
     BadRequest:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
       description: BadRequest. Returned when the payload is invalid.
+    NotFound:
+      description: Returned when the requested ressource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NotFoundError"
     Conflict:
       description: Conflict. Returned when resource cannot be created because of business rules violation.
       content:
@@ -241,33 +143,30 @@ components:
           schema:
             $ref: "#/components/schemas/Error"
   schemas:
-    WordsPostRequestBody:
-      $ref: "#/components/schemas/WordDTO"
-    WordsPutRequestBody:
-      $ref: "#/components/schemas/WordDTO"
-    WordsDeleteRequestBody:
+    TranslationKeyDTO:
       type: object
       required:
         - key
+        - languages
       properties:
         key:
           type: string
           maxLength: 20
           minLength: 1
-    WordDTO:
+        languages:
+          type: array
+          items:
+            $ref: "#/components/schemas/TranslationDTO"
+    TranslationDTO:
       type: object
       required:
-        - key
-        - content
+        - code
+        - text
       properties:
-        key:
+        code:
           type: string
-          maxLength: 20
-          minLength: 1
-        content:
+        text:
           type: string
-          maxLength: 50
-          minLength: 1
     Error:
       description: Standard Error response.
       type: object
@@ -278,11 +177,22 @@ components:
       properties:
         error_type:
           type: string
-          description: "example: `UNAUTHORIZED`."
+#          description: "example: `UNAUTHORIZED`."
         name:
           type: string
           description: Error name.
         message:
           type: string
           description: The detailed reason of the error.
+    NotFoundError:
+      description: Ressource not found Error response.
+      allOf:
+        - $ref: "#/components/schemas/Error"
+        - type: object
+          required:
+             - error_type
+          properties:
+            error_type:
+              type: string
+              description: "example `The translations not found for this project`"
 #  securitySchemes:

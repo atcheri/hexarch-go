@@ -5,7 +5,6 @@ package dto
 
 // Standard Error response.
 type Error struct {
-	// example: `UNAUTHORIZED`.
 	ErrorType string `json:"error_type"`
 
 	// The detailed reason of the error.
@@ -15,94 +14,51 @@ type Error struct {
 	Name string `json:"name"`
 }
 
-// WordDTO defines model for WordDTO.
-type WordDTO struct {
-	Content string `json:"content"`
-	Key     string `json:"key"`
+// NotFoundError defines model for NotFoundError.
+type NotFoundError struct {
+	// Embedded struct due to allOf(#/components/schemas/Error)
+	Error `yaml:",inline"`
+	// Embedded fields due to inline allOf schema
+	// example `The translations not found for this project`
+	ErrorType string `json:"error_type"`
 }
 
-// WordsDeleteRequestBody defines model for WordsDeleteRequestBody.
-type WordsDeleteRequestBody struct {
-	Key string `json:"key"`
+// TranslationDTO defines model for TranslationDTO.
+type TranslationDTO struct {
+	Code string `json:"code"`
+	Text string `json:"text"`
 }
 
-// WordsPostRequestBody defines model for WordsPostRequestBody.
-type WordsPostRequestBody WordDTO
+// TranslationKeyDTO defines model for TranslationKeyDTO.
+type TranslationKeyDTO struct {
+	Key       string           `json:"key"`
+	Languages []TranslationDTO `json:"languages"`
+}
 
-// WordsPutRequestBody defines model for WordsPutRequestBody.
-type WordsPutRequestBody WordDTO
+// GetProjectTranslationsLanguagesParam defines model for GetProjectTranslationsLanguagesParam.
+type GetProjectTranslationsLanguagesParam []string
 
-// GetWordLimitParam defines model for GetWordLimitParam.
-type GetWordLimitParam int
-
-// GetWordOffsetParam defines model for GetWordOffsetParam.
-type GetWordOffsetParam int
-
-// Rules for the search query parameter
-type GetWordSearchParam string
-
-// Standard Error response.
-type BadRequest Error
-
-// Standard Error response.
-type Conflict Error
+// ProjectNameParam defines model for ProjectNameParam.
+type ProjectNameParam string
 
 // Standard Error response.
 type InternalServerError Error
 
-// WordsDeleteResponse defines model for WordsDeleteResponse.
-type WordsDeleteResponse struct {
-	// Contains the successful message of word deletion
-	Success string `json:"success"`
+// Ressource not found Error response.
+type NotFound NotFoundError
+
+// ProjectTranslationsGetResponse defines model for ProjectTranslationsGetResponse.
+type ProjectTranslationsGetResponse struct {
+	// The total amount of translations
+	Total int `json:"total"`
+
+	// The list of translations
+	Translations []TranslationKeyDTO `json:"translations"`
 }
 
-// WordsGetResponse defines model for WordsGetResponse.
-type WordsGetResponse struct {
-	// The total amount of records
-	Count int `json:"count"`
-
-	// The list of words
-	Words []WordDTO `json:"words"`
+// GetSomethingParams defines parameters for GetSomething.
+type GetSomethingParams struct {
+	// A list of Language codes
+	Languages *GetProjectTranslationsLanguagesParam `json:"languages,omitempty"`
 }
 
-// WordsPostResponse defines model for WordsPostResponse.
-type WordsPostResponse struct {
-	// The id of the created word
-	Id string `json:"id"`
-}
-
-// WordsPutResponse defines model for WordsPutResponse.
-type WordsPutResponse struct {
-	// The id of the updated word
-	Id string `json:"id"`
-}
-
-// DeleteWordJSONBody defines parameters for DeleteWord.
-type DeleteWordJSONBody WordsDeleteRequestBody
-
-// GetWordsParams defines parameters for GetWords.
-type GetWordsParams struct {
-	// Parameter used to search for a word.
-	Q *GetWordSearchParam `json:"q,omitempty"`
-
-	// Offset pagination parameter. Starts from 0
-	Offset GetWordOffsetParam `json:"offset"`
-
-	// Limit pagination parameter. Starts from 5
-	Limit GetWordLimitParam `json:"limit"`
-}
-
-// PostWordJSONBody defines parameters for PostWord.
-type PostWordJSONBody WordsPostRequestBody
-
-// PutWordJSONBody defines parameters for PutWord.
-type PutWordJSONBody WordsPutRequestBody
-
-// DeleteWordJSONRequestBody defines body for DeleteWord for application/json ContentType.
-type DeleteWordJSONRequestBody DeleteWordJSONBody
-
-// PostWordJSONRequestBody defines body for PostWord for application/json ContentType.
-type PostWordJSONRequestBody PostWordJSONBody
-
-// PutWordJSONRequestBody defines body for PutWord for application/json ContentType.
-type PutWordJSONRequestBody PutWordJSONBody
