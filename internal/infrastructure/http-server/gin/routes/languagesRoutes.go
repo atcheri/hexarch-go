@@ -21,6 +21,7 @@ func AddTranslationsRoutes(router *gin.Engine, tc TranslationsController) {
 	group := router.Group("/translations/:projectName")
 	group.GET("/", tc.GetAllHandler)
 	group.POST("/", tc.PostProjectTranslationHandler)
+	group.PUT("/", tc.PutProjectTranslationHandler)
 }
 
 // NewTranslationsController is a TranslationsController factory function
@@ -55,7 +56,11 @@ func (lc TranslationsController) PostProjectTranslationHandler(c *gin.Context) {
 	name := c.Param("projectName")
 	var body dto.CreateProjectTranslationRequestBody
 	if err := c.BindJSON(&body); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(http.StatusBadRequest, "Resource not created", fmt.Sprintf("impossible to create a new translations for this project: %s", name)))
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not created",
+			fmt.Sprintf("impossible to create a new translation for this project: %s", name),
+		))
 		return
 	}
 	key := body.Key
@@ -63,11 +68,42 @@ func (lc TranslationsController) PostProjectTranslationHandler(c *gin.Context) {
 	text := body.Text
 	err := lc.translationsRepo.AddForProject(c, name, key, code, text)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(http.StatusBadRequest, "Resource not created", fmt.Sprintf("impossible to create a new translations for this project: %s", name)))
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not created",
+			fmt.Sprintf("impossible to create a new translation for this project: %s", name),
+		))
 		return
 	}
 
 	c.Status(http.StatusCreated)
+}
+
+func (lc TranslationsController) PutProjectTranslationHandler(c *gin.Context) {
+	name := c.Param("projectName")
+	var body dto.CreateProjectTranslationRequestBody
+	if err := c.BindJSON(&body); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not updated",
+			fmt.Sprintf("impossible to update a translation for this project: %s", name),
+		))
+		return
+	}
+	key := body.Key
+	code := body.Code
+	text := body.Text
+	err := lc.translationsRepo.EditForProject(c, name, key, code, text)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not updated",
+			fmt.Sprintf("impossible to update a translation for this project: %s", name),
+		))
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
 
 func buildGinErrorJSON(code int, name, message string) gin.H {

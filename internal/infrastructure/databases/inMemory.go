@@ -11,7 +11,7 @@ import (
 
 var (
 	inMemoryProjects  = []string{"acme-test", "hitgub"}
-	inMemorylanguages = []string{"en", "fr", "ja", "pt", "es", "it"}
+	inMemoryLanguages = []string{"en", "fr", "ja", "pt", "es", "it"}
 )
 
 type projectTranslationsType map[string][]domain.Translation
@@ -60,21 +60,13 @@ func (db *InMemoryDB) GetProjectTranslations(_ context.Context, name string, off
 }
 
 func (db *InMemoryDB) AddProjectTranslation(_ context.Context, name, key, code, text string) error {
-	translations, ok := db.translations[name]
-	if !ok {
-		return fmt.Errorf("impossible to add translation to this project: %s", name)
-	}
-
-	_, hasKey := lo.Find[domain.Translation](translations, func(t domain.Translation) bool {
-		return t.GetKey() == key
-	})
-
-	if hasKey {
-		return fmt.Errorf("cannot add a new translation. The key %s already exists for this project %s", key, name)
+	translations, err := db.findProjectTranslationsForKey(name, key)
+	if err != nil {
+		return err
 	}
 
 	newTranslation, _ := domain.NewTranslation(key)
-	for _, l := range inMemorylanguages {
+	for _, l := range inMemoryLanguages {
 		textToSave := ""
 		if l == code {
 			textToSave = text
@@ -85,6 +77,73 @@ func (db *InMemoryDB) AddProjectTranslation(_ context.Context, name, key, code, 
 	db.translations[name] = append(translations, newTranslation)
 
 	return nil
+}
+
+// EditProjectTranslation just edits a translation for a given language, key and project
+func (db *InMemoryDB) EditProjectTranslation(_ context.Context, name, key, code, text string) error {
+	translations, err := db.findProjectTranslations(name)
+	if err != nil {
+		return err
+	}
+
+	translation, ti, tFound := lo.FindIndexOf[domain.Translation](translations, func(t domain.Translation) bool {
+		return t.GetKey() == key
+	})
+
+	if !tFound {
+		return fmt.Errorf("impossible to edit translation for the key %s. The key translation key doesn't exist for this project %s", key, name)
+	}
+
+	languageTranslations := translation.GetTranslations()
+
+	newTranslationLanguages := make([]domain.LanguageTranslation, len(languageTranslations))
+	copy(newTranslationLanguages, languageTranslations)
+	_, lti, ltFound := lo.FindIndexOf[domain.LanguageTranslation](languageTranslations, func(lt domain.LanguageTranslation) bool {
+		return lt.GetCode() == code
+	})
+
+	if !ltFound {
+		return fmt.Errorf("impossible to edit translation for the key %s and code %s. The key translation for the given language doesn't exist for this project %s", key, code, name)
+	}
+
+	newTranslationLanguage, _ := domain.NewLanguageTranslation(code, text)
+	newTranslationLanguages[lti] = newTranslationLanguage
+
+	newTranslations := make([]domain.Translation, len(translations))
+	copy(newTranslations, translations)
+	newTranslation, _ := domain.NewTranslation(key)
+	lo.ForEach[domain.LanguageTranslation](newTranslationLanguages, func(tl domain.LanguageTranslation, index int) {
+		newTranslation = newTranslation.AddTranslation(tl)
+	})
+	newTranslations[ti] = newTranslation
+	db.translations[name] = newTranslations
+
+	return nil
+}
+
+func (db *InMemoryDB) findProjectTranslationsForKey(name, key string) ([]domain.Translation, error) {
+	translations, err := db.findProjectTranslations(name)
+	if err != nil {
+		return nil, err
+	}
+
+	_, hasKey := lo.Find[domain.Translation](translations, func(t domain.Translation) bool {
+		return t.GetKey() == key
+	})
+
+	if hasKey {
+		return nil, fmt.Errorf("cannot add a new translation. The key %s already exists for this project %s", key, name)
+	}
+	return translations, nil
+}
+
+func (db *InMemoryDB) findProjectTranslations(name string) ([]domain.Translation, error) {
+	translations, ok := db.translations[name]
+	if !ok {
+		return nil, fmt.Errorf("impossible to add translation to this project: %s", name)
+	}
+
+	return translations, nil
 }
 
 func createProjectTranslations(names, keys []string, languages []string, translationCodesAndValues [][]string) projectTranslationsType {
