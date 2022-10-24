@@ -4,48 +4,46 @@ import (
 	"context"
 	"fmt"
 
-	"golang.org/x/exp/maps"
+	"github.com/samber/lo"
 
 	"github.com/atcheri/hexarch-go/internal/core/domain"
-	"github.com/pkg/errors"
+)
+
+var (
+	inMemoryProjects  = []string{"acme-test", "hitgub"}
+	inMemorylanguages = []string{"en", "fr", "ja", "pt", "es", "it"}
 )
 
 type projectTranslationsType map[string][]domain.Translation
 
 type InMemoryDB struct {
-	words, sentences map[string]string
-	translations     projectTranslationsType
+	projects     []string
+	translations projectTranslationsType
 }
 
 // NewInMemoryDB is the factory function for a InMemoryDB struct
 func NewInMemoryDB() *InMemoryDB {
-	words := make(map[string]string, 0)
-	words["firstName"] = "Prénom"
-	words["middle_name"] = "Deuxième prénom"
-	words["lastName"] = "Nom de famille"
-	words["gender"] = "Sexe"
-	words["birthday"] = "Date de naissance"
-	words["title"] = "Titre"
-	words["height"] = "Taille"
-	sentences := make(map[string]string, 0)
-
-	translations := createProjectTranslations([]string{"acme-test", "hitgub"}, []string{"home", "contact", "about-us"}, []string{"en", "fr", "pt", "jp"}, [][]string{
+	translations := createProjectTranslations(inMemoryProjects, []string{"home", "contact", "about-us"}, []string{"en", "fr", "pt", "jp"}, [][]string{
 		{"home", "accueil", "casa", "ホーム"},
 		{"contact", "contact", "contato", "問い合わせ"},
 		{"about us", "à propos", "sobre nós", "会社概要"},
 	})
 
 	return &InMemoryDB{
-		words:        words,
-		sentences:    sentences,
+		projects:     inMemoryProjects,
 		translations: translations,
 	}
 }
 
-func (db *InMemoryDB) GetWords(offset, limit int) map[string]string {
-	words := make(map[string]string)
+func (db *InMemoryDB) GetProjectTranslations(_ context.Context, name string, offset, limit int) ([]domain.Translation, error) {
+	_, ok := db.translations[name]
+	if !ok {
+		return nil, fmt.Errorf("no translations found for this project: %s", name)
+	}
+
+	translations := make([]domain.Translation, 0)
 	i := 0
-	for key, word := range db.words {
+	for _, t := range db.translations[name] {
 		if i < offset {
 			i++
 			continue
@@ -54,53 +52,39 @@ func (db *InMemoryDB) GetWords(offset, limit int) map[string]string {
 			break
 		}
 
-		words[key] = word
+		translations = append(translations, t)
 		i++
 	}
-	return words
+
+	return translations, nil
 }
 
-func (db *InMemoryDB) GetWordsInString(offset, limit int) []string {
-	return maps.Values(db.words)[offset:limit]
-}
-
-func (db *InMemoryDB) GetWordByKey(key string) (string, error) {
-	if w, ok := db.words[key]; ok {
-		return w, nil
-	}
-
-	return "", fmt.Errorf("word not for for key %s", key)
-}
-
-func (db *InMemoryDB) AddWord(key, content string) {
-	db.words[key] = content
-}
-
-func (db *InMemoryDB) RemoveWord(key string) {
-	delete(db.words, key)
-}
-
-func (db *InMemoryDB) GetProjectTranslations(ctx context.Context, name string, offset, limit int) ([]domain.Translation, error) {
+func (db *InMemoryDB) AddProjectTranslation(_ context.Context, name, key, code, text string) error {
 	translations, ok := db.translations[name]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("no translations found for this project: %s", name))
+		return fmt.Errorf("impossible to add translation to this project: %s", name)
 	}
 
-	//words := make(map[string]string)
-	//i := 0
-	//for key, word := range db.words {
-	//	if i < offset {
-	//		i++
-	//		continue
-	//	}
-	//	if i == offset+limit {
-	//		break
-	//	}
-	//
-	//	words[key] = word
-	//	i++
-	//}
-	return translations, nil
+	_, hasKey := lo.Find[domain.Translation](translations, func(t domain.Translation) bool {
+		return t.GetKey() == key
+	})
+
+	if hasKey {
+		return fmt.Errorf("cannot add a new translation. The key %s already exists for this project %s", key, name)
+	}
+
+	newTranslation, _ := domain.NewTranslation(key)
+	for _, l := range inMemorylanguages {
+		textToSave := ""
+		if l == code {
+			textToSave = text
+		}
+		newTranslation, _ = newTranslation.AddTranslationWithCodeAndText(l, textToSave)
+	}
+
+	db.translations[name] = append(translations, newTranslation)
+
+	return nil
 }
 
 func createProjectTranslations(names, keys []string, languages []string, translationCodesAndValues [][]string) projectTranslationsType {
@@ -110,7 +94,7 @@ func createProjectTranslations(names, keys []string, languages []string, transla
 		for ki, key := range keys {
 			translation, _ := domain.NewTranslation(key)
 			for li, lang := range languages {
-				tv, _ := domain.NewTranslationValue(lang, translationCodesAndValues[ki][li])
+				tv, _ := domain.NewLanguageTranslation(lang, translationCodesAndValues[ki][li])
 				translation = translation.AddTranslation(tv)
 			}
 			translations[ki] = translation

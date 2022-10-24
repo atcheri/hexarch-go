@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 
 	dto "github.com/atcheri/hexarch-go/internal/core/dtos"
 	ports "github.com/atcheri/hexarch-go/internal/core/ports/right/repositories"
@@ -19,6 +20,7 @@ type TranslationsController struct {
 func AddTranslationsRoutes(router *gin.Engine, tc TranslationsController) {
 	group := router.Group("/translations/:projectName")
 	group.GET("/", tc.GetAllHandler)
+	group.POST("/", tc.PostProjectTranslationHandler)
 }
 
 // NewTranslationsController is a TranslationsController factory function
@@ -35,12 +37,11 @@ func (lc TranslationsController) GetAllHandler(c *gin.Context) {
 	limit := 5
 	translations, err := lc.translationsRepo.GetForProject(c, name, offset, limit)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 			"error_type": http.StatusText(http.StatusNotFound),
 			"name":       "Resource not found",
-			"message":    fmt.Sprintf("the translations were not found for this project: %s", name),
+			"message":    errors.Wrap(err, fmt.Sprintf("the translations were not found for this project: %s", name)),
 		})
-		return
 	}
 	dots := dto.ToTranslationKeyDTOs(translations)
 	c.JSON(http.StatusOK, gin.H{
@@ -48,4 +49,31 @@ func (lc TranslationsController) GetAllHandler(c *gin.Context) {
 		// TODO: we need to calculate the total translations for the project
 		"total": len(dots),
 	})
+}
+
+func (lc TranslationsController) PostProjectTranslationHandler(c *gin.Context) {
+	name := c.Param("projectName")
+	var body dto.CreateProjectTranslationRequestBody
+	if err := c.BindJSON(&body); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(http.StatusBadRequest, "Resource not created", fmt.Sprintf("impossible to create a new translations for this project: %s", name)))
+		return
+	}
+	key := body.Key
+	code := body.Code
+	text := body.Text
+	err := lc.translationsRepo.AddForProject(c, name, key, code, text)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(http.StatusBadRequest, "Resource not created", fmt.Sprintf("impossible to create a new translations for this project: %s", name)))
+		return
+	}
+
+	c.Status(http.StatusCreated)
+}
+
+func buildGinErrorJSON(code int, name, message string) gin.H {
+	return gin.H{
+		"error_type": http.StatusText(code),
+		"name":       name,
+		"message":    message,
+	}
 }

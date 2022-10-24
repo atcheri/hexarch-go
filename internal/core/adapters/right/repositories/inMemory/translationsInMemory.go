@@ -20,3 +20,22 @@ func NewInMemoryTranslations(db *databases.InMemoryDB) ports.TranslationsReposit
 func (i inMemoryTranslations) GetForProject(ctx context.Context, name string, offset, limit int) ([]domain.Translation, error) {
 	return i.db.GetProjectTranslations(ctx, name, offset, limit)
 }
+
+func (i inMemoryTranslations) AddForProject(ctx context.Context, name, key, code, text string) error {
+	return i.db.AddProjectTranslation(ctx, name, key, code, text)
+}
+
+func (i inMemoryTranslations) EditForProject(_ context.Context, _, _, _, _ string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (i inMemoryTranslations) DeleteKeyForProject(_ context.Context, _, _ string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (i inMemoryTranslations) DeleteLanguageTranslationForProject(_ context.Context, _, _, _ string) error {
+	//TODO implement me
+	panic("implement me")
+}

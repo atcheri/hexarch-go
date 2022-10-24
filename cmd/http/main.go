@@ -33,7 +33,7 @@ func main() {
 	db := databases.NewInMemoryDB()
 
 	// Initializing repositories
-	translationsRepo := inMemory.NewInMemoryTranslations(db)
+	translationsRepo := adapters.NewInMemoryTranslations(db)
 
 	app := server.NewGinApp(server.NewAppControllers(server.AppControllersDependencies{TranslationsRepo: translationsRepo}))
 

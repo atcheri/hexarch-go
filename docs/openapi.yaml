@@ -36,11 +36,11 @@ info:
 paths:
   /api/translations/{projectName}:
     get:
-      summary: Project translations
+      summary: Get Project translations
       description: |
         This endpoint allows you to get all the translations for a given Project.<br>
         You can also filter by specifying only the languages that you want.
-      operationId: getSomething
+      operationId: getProjectTranslations
       parameters:
         - $ref: "#/components/parameters/ProjectNameParam"
         - $ref: "#/components/parameters/GetProjectTranslationsLanguagesParam"
@@ -49,6 +49,28 @@ paths:
           $ref: "#/components/responses/ProjectTranslationsGetResponse"
         404:
           $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+      tags:
+        - Translation
+    post:
+      summary: Create Project translations
+      description: |
+        This endpoint allows you to to add a translation for a specific project
+      operationId: postProjectTranslation
+      parameters:
+        - $ref: "#/components/parameters/ProjectNameParam"
+      requestBody:
+        description: Required data to create a translation for the project
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectTranslationRequestBody"
+      responses:
+        201:
+          $ref: "#/components/responses/CreateResourceResponse"
+        400:
+          $ref: "#/components/responses/BadRequest"
         500:
           $ref: "#/components/responses/InternalServerError"
       tags:
@@ -118,6 +140,8 @@ components:
                       - code: pt
                         tect: sobre nós
                 total: 3
+    CreateResourceResponse:
+      description: Response of a created resource.
     BadRequest:
       content:
         application/json:
@@ -163,6 +187,19 @@ components:
         - code
         - text
       properties:
+        code:
+          type: string
+        text:
+          type: string
+    CreateProjectTranslationRequestBody:
+      type: object
+      required:
+        - key
+        - code
+        - text
+      properties:
+        key:
+          type: string
         code:
           type: string
         text:
