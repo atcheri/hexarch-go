@@ -21,7 +21,7 @@ func AddTranslationsRoutes(router *gin.Engine, tc TranslationsController) {
 	group := router.Group("/translations/:projectName")
 	group.GET("/", tc.GetAllHandler)
 	group.POST("/", tc.PostProjectTranslationHandler)
-	group.PUT("/", tc.PutProjectTranslationHandler)
+	group.PUT("/:translationId", tc.PutProjectTranslationHandler)
 }
 
 // NewTranslationsController is a TranslationsController factory function
@@ -81,24 +81,25 @@ func (lc TranslationsController) PostProjectTranslationHandler(c *gin.Context) {
 
 func (lc TranslationsController) PutProjectTranslationHandler(c *gin.Context) {
 	name := c.Param("projectName")
-	var body dto.CreateProjectTranslationRequestBody
+	id := c.Param("translationId")
+	var body dto.EditProjectTranslationRequestBody
 	if err := c.BindJSON(&body); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
 			http.StatusBadRequest,
 			"Resource not updated",
-			fmt.Sprintf("impossible to update a translation for this project: %s", name),
+			fmt.Sprintf("impossible to edit a translation for this project: %s", name),
 		))
 		return
 	}
 	key := body.Key
 	code := body.Code
 	text := body.Text
-	err := lc.translationsRepo.EditForProject(c, name, key, code, text)
+	err := lc.translationsRepo.EditForProject(c, id, name, key, code, text)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
 			http.StatusBadRequest,
 			"Resource not updated",
-			fmt.Sprintf("impossible to update a translation for this project: %s", name),
+			fmt.Sprintf("Failed to edit the translation for this project: %s", name),
 		))
 		return
 	}

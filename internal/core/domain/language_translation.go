@@ -2,6 +2,7 @@ package domain
 
 // LanguageTranslation is
 type LanguageTranslation struct {
+	id   string
 	code string
 	text string
 }

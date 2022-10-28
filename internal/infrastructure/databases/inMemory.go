@@ -80,7 +80,7 @@ func (db *InMemoryDB) AddProjectTranslation(_ context.Context, name, key, code, 
 }
 
 // EditProjectTranslation just edits a translation for a given language, key and project
-func (db *InMemoryDB) EditProjectTranslation(_ context.Context, name, key, code, text string) error {
+func (db *InMemoryDB) EditProjectTranslation(_ context.Context, _, name, key, code, text string) error {
 	translations, err := db.findProjectTranslations(name)
 	if err != nil {
 		return err

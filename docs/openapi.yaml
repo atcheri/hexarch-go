@@ -68,7 +68,32 @@ paths:
               $ref: "#/components/schemas/CreateProjectTranslationRequestBody"
       responses:
         201:
-          $ref: "#/components/responses/CreateResourceResponse"
+          $ref: "#/components/responses/CreateTranslationResponse"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+      tags:
+        - Translation
+
+  /api/translations/{projectName}/{translationId}:
+    put:
+      summary: Edit Project translations
+      description: |
+        This endpoint allows you to to edit and modify a translation for a specific project
+      operationId: putProjectTranslation
+      parameters:
+        - $ref: "#/components/parameters/ProjectNameParam"
+        - $ref: "#/components/parameters/TranslationIdParam"
+      requestBody:
+        description: Required data to edit a translation for the project
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditProjectTranslationRequestBody"
+      responses:
+        201:
+          $ref: "#/components/responses/EditTranslationResponse"
         400:
           $ref: "#/components/responses/BadRequest"
         500:
@@ -87,6 +112,15 @@ components:
         type: string
       example:
         - traduction-project-1
+    TranslationIdParam:
+      name: translationId
+      description: The id of the project's translation
+      in: path
+      required: true
+      schema:
+        type: string
+      example:
+        - 1234-4567-8901-2345
     GetProjectTranslationsLanguagesParam:
       name: languages
       description: A list of Language codes
@@ -140,8 +174,12 @@ components:
                       - code: pt
                         tect: sobre nós
                 total: 3
-    CreateResourceResponse:
-      description: Response of a created resource.
+    CreateTranslationResponse:
+      description: Response of a created translation.
+    EditTranslationResponse:
+      description: Response of an edited translation.
+      allOf:
+        - $ref: "#/components/schemas/CreateTranslationResponse"
     BadRequest:
       content:
         application/json:
@@ -192,6 +230,7 @@ components:
         text:
           type: string
     CreateProjectTranslationRequestBody:
+      description: The payload body to create a translation
       type: object
       required:
         - key
@@ -204,6 +243,10 @@ components:
           type: string
         text:
           type: string
+    EditProjectTranslationRequestBody:
+      description: The payload body to edit a translation
+      allOf:
+        - $ref: "#/components/schemas/CreateProjectTranslationRequestBody"
     Error:
       description: Standard Error response.
       type: object
