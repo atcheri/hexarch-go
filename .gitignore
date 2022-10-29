@@ -29,3 +29,6 @@ vendor/
 # Logs
 logs
 *.log
+
+# env file
+.env
