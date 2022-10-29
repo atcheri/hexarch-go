@@ -10,6 +10,11 @@ type CreateProjectTranslationRequestBody struct {
 	Text string `json:"text"`
 }
 
+// The payload body to delete translations for a key
+type DeleteProjectTranslationRequestBody struct {
+	Key string `json:"key"`
+}
+
 // EditProjectTranslationRequestBody defines model for EditProjectTranslationRequestBody.
 type EditProjectTranslationRequestBody struct {
 	// Embedded struct due to allOf(#/components/schemas/CreateProjectTranslationRequestBody)
@@ -75,6 +80,9 @@ type ProjectTranslationsGetResponse struct {
 	Translations []TranslationKeyDTO `json:"translations"`
 }
 
+// DeleteProjectTranslationsJSONBody defines parameters for DeleteProjectTranslations.
+type DeleteProjectTranslationsJSONBody DeleteProjectTranslationRequestBody
+
 // GetProjectTranslationsParams defines parameters for GetProjectTranslations.
 type GetProjectTranslationsParams struct {
 	// A list of Language codes
@@ -86,6 +94,9 @@ type PostProjectTranslationJSONBody CreateProjectTranslationRequestBody
 
 // PutProjectTranslationJSONBody defines parameters for PutProjectTranslation.
 type PutProjectTranslationJSONBody EditProjectTranslationRequestBody
+
+// DeleteProjectTranslationsJSONRequestBody defines body for DeleteProjectTranslations for application/json ContentType.
+type DeleteProjectTranslationsJSONRequestBody DeleteProjectTranslationsJSONBody
 
 // PostProjectTranslationJSONRequestBody defines body for PostProjectTranslation for application/json ContentType.
 type PostProjectTranslationJSONRequestBody PostProjectTranslationJSONBody

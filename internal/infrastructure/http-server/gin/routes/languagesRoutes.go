@@ -21,6 +21,8 @@ func AddTranslationsRoutes(router *gin.Engine, tc TranslationsController) {
 	group := router.Group("/translations/:projectName")
 	group.GET("/", tc.GetAllHandler)
 	group.POST("/", tc.PostProjectTranslationHandler)
+	group.DELETE("/", tc.DeleteProjectTranslationHandler)
+
 	group.PUT("/:translationId", tc.PutProjectTranslationHandler)
 }
 
@@ -71,7 +73,7 @@ func (lc TranslationsController) PostProjectTranslationHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
 			http.StatusBadRequest,
 			"Resource not created",
-			fmt.Sprintf("impossible to create a new translation for this project: %s", name),
+			fmt.Sprintf("failed to create a new translation for this project: %s", name),
 		))
 		return
 	}
@@ -99,12 +101,38 @@ func (lc TranslationsController) PutProjectTranslationHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
 			http.StatusBadRequest,
 			"Resource not updated",
-			fmt.Sprintf("Failed to edit the translation for this project: %s", name),
+			fmt.Sprintf("failed to edit the translation for this project: %s", name),
 		))
 		return
 	}
 
 	c.Status(http.StatusOK)
+}
+
+func (lc TranslationsController) DeleteProjectTranslationHandler(c *gin.Context) {
+	name := c.Param("projectName")
+	var body dto.DeleteProjectTranslationRequestBody
+	if err := c.BindJSON(&body); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not deleted",
+			fmt.Sprintf("impossible to delete the translations for this project: %s", name),
+		))
+		return
+	}
+	key := body.Key
+	err := lc.translationsRepo.DeleteKeyForProject(c, name, key)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not updated",
+			fmt.Sprintf("failed to delete the translations for this project: %s, key: %s", name, key),
+		))
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+
 }
 
 func buildGinErrorJSON(code int, name, message string) gin.H {

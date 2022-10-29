@@ -121,6 +121,28 @@ func (db *InMemoryDB) EditProjectTranslation(_ context.Context, _, name, key, co
 	return nil
 }
 
+func (db *InMemoryDB) DeleteByKey(_ context.Context, name, key string) error {
+	translations, err := db.findProjectTranslations(name)
+	if err != nil {
+		return err
+	}
+
+	_, _, tFound := lo.FindIndexOf[domain.Translation](translations, func(t domain.Translation) bool {
+		return t.GetKey() == key
+	})
+
+	if !tFound {
+		return fmt.Errorf("impossible to edit translation for the key %s. The key translation key doesn't exist for this project %s", key, name)
+	}
+
+	db.translations[name] = lo.Filter[domain.Translation](translations, func(t domain.Translation, _ int) bool {
+		return t.GetKey() != key
+	})
+
+	return nil
+
+}
+
 func (db *InMemoryDB) findProjectTranslationsForKey(name, key string) ([]domain.Translation, error) {
 	translations, err := db.findProjectTranslations(name)
 	if err != nil {
@@ -140,7 +162,7 @@ func (db *InMemoryDB) findProjectTranslationsForKey(name, key string) ([]domain.
 func (db *InMemoryDB) findProjectTranslations(name string) ([]domain.Translation, error) {
 	translations, ok := db.translations[name]
 	if !ok {
-		return nil, fmt.Errorf("impossible to add translation to this project: %s", name)
+		return nil, fmt.Errorf("impossible to find translations for this project: %s", name)
 	}
 
 	return translations, nil

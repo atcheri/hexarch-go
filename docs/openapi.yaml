@@ -61,7 +61,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProjectNameParam"
       requestBody:
-        description: Required data to create a translation for the project
+        description: Required data to create a new translation with a key, for the project
         content:
           application/json:
             schema:
@@ -71,6 +71,27 @@ paths:
           $ref: "#/components/responses/CreateTranslationResponse"
         400:
           $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+      tags:
+        - Translation
+    delete:
+      summary: Delete Project translations
+      description: This endpoint allows you to delete all the translations of a Project for a given "key"
+      operationId: deleteProjectTranslations
+      parameters:
+        - $ref: "#/components/parameters/ProjectNameParam"
+      requestBody:
+        description: Required data to delete the translations of a project
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteProjectTranslationRequestBody"
+      responses:
+        204:
+          $ref: "#/components/responses/ProjectTranslationsDeleteResponse"
+        404:
+          $ref: "#/components/responses/NotFound"
         500:
           $ref: "#/components/responses/InternalServerError"
       tags:
@@ -178,8 +199,10 @@ components:
       description: Response of a created translation.
     EditTranslationResponse:
       description: Response of an edited translation.
-      allOf:
-        - $ref: "#/components/schemas/CreateTranslationResponse"
+#      allOf:
+#        - $ref: "#/components/schemas/CreateTranslationResponse"
+    ProjectTranslationsDeleteResponse:
+      description: Response of a delete translation key.
     BadRequest:
       content:
         application/json:
@@ -247,6 +270,14 @@ components:
       description: The payload body to edit a translation
       allOf:
         - $ref: "#/components/schemas/CreateProjectTranslationRequestBody"
+    DeleteProjectTranslationRequestBody:
+      description: The payload body to delete translations for a key
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
     Error:
       description: Standard Error response.
       type: object

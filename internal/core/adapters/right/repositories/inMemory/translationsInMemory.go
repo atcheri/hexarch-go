@@ -29,9 +29,8 @@ func (i inMemoryTranslations) EditForProject(ctx context.Context, id, name, key,
 	return i.db.EditProjectTranslation(ctx, id, name, key, code, text)
 }
 
-func (i inMemoryTranslations) DeleteKeyForProject(_ context.Context, _, _ string) error {
-	//TODO implement me
-	panic("implement me")
+func (i inMemoryTranslations) DeleteKeyForProject(ctx context.Context, name, key string) error {
+	return i.db.DeleteByKey(ctx, name, key)
 }
 
 func (i inMemoryTranslations) DeleteLanguageTranslationForProject(_ context.Context, _, _, _ string) error {
