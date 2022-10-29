@@ -18,7 +18,7 @@ COPY . .
 RUN ls -la
 
 # Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/http/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o http ./cmd/http/main.go
 
 ######## Start a new stage from scratch #######
 FROM scratch
@@ -26,7 +26,7 @@ FROM scratch
 WORKDIR /root/
 
 # Copy the Pre-built binary file from the previous stage
-COPY --from=builder /app/main .
+COPY --from=builder /app/http .
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
