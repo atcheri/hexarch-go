@@ -55,7 +55,29 @@ paths:
           $ref: "#/components/responses/InternalServerError"
       tags:
         - Project
-
+  /api/projects/{projectName}:
+    put:
+      summary: Edit a Project
+      description: |
+        This endpoint allows you to to edit and modify a project and its information
+      operationId: putProject
+      parameters:
+        - $ref: "#/components/parameters/ProjectNameParam"
+      requestBody:
+        description: Required data to edit the details of a project
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditProjectRequestBody"
+      responses:
+        201:
+          $ref: "#/components/responses/EditProjectResponse"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+      tags:
+        - Project
   /api/translations/{projectName}:
     get:
       summary: Get Project translations
@@ -118,7 +140,6 @@ paths:
           $ref: "#/components/responses/InternalServerError"
       tags:
         - Translation
-
   /api/translations/{projectName}/{translationId}:
     put:
       summary: Edit Project translations
@@ -219,6 +240,8 @@ components:
                 total: 3
     CreateProjectResponse:
       description: Response of a created project.
+    EditProjectResponse:
+      description: Response of an edited project.
     CreateTranslationResponse:
       description: Response of a created translation.
     EditTranslationResponse:
@@ -286,6 +309,9 @@ components:
           type: string
           maxLength: 20
           minLength: 1
+    EditProjectRequestBody:
+      allOf:
+        - $ref: "#/components/schemas/CreateProjectRequestBody"
     CreateProjectTranslationRequestBody:
       description: The payload body to create a translation
       type: object

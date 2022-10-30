@@ -20,6 +20,12 @@ type DeleteProjectTranslationRequestBody struct {
 	Key string `json:"key"`
 }
 
+// EditProjectRequestBody defines model for EditProjectRequestBody.
+type EditProjectRequestBody struct {
+	// Embedded struct due to allOf(#/components/schemas/CreateProjectRequestBody)
+	CreateProjectRequestBody `yaml:",inline"`
+}
+
 // EditProjectTranslationRequestBody defines model for EditProjectTranslationRequestBody.
 type EditProjectTranslationRequestBody struct {
 	// Embedded struct due to allOf(#/components/schemas/CreateProjectTranslationRequestBody)
@@ -88,6 +94,9 @@ type ProjectTranslationsGetResponse struct {
 // PostProjectJSONBody defines parameters for PostProject.
 type PostProjectJSONBody CreateProjectRequestBody
 
+// PutProjectJSONBody defines parameters for PutProject.
+type PutProjectJSONBody EditProjectRequestBody
+
 // DeleteProjectTranslationsJSONBody defines parameters for DeleteProjectTranslations.
 type DeleteProjectTranslationsJSONBody DeleteProjectTranslationRequestBody
 
@@ -105,6 +114,9 @@ type PutProjectTranslationJSONBody EditProjectTranslationRequestBody
 
 // PostProjectJSONRequestBody defines body for PostProject for application/json ContentType.
 type PostProjectJSONRequestBody PostProjectJSONBody
+
+// PutProjectJSONRequestBody defines body for PutProject for application/json ContentType.
+type PutProjectJSONRequestBody PutProjectJSONBody
 
 // DeleteProjectTranslationsJSONRequestBody defines body for DeleteProjectTranslations for application/json ContentType.
 type DeleteProjectTranslationsJSONRequestBody DeleteProjectTranslationsJSONBody
