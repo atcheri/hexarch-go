@@ -48,6 +48,19 @@ func (db *InMemoryDB) CreateProject(_ context.Context, name string) error {
 	return nil
 }
 
+func (db *InMemoryDB) EditProject(_ context.Context, oldName, newName string) error {
+	_, i, _ := lo.FindIndexOf[string](db.projects, func(p string) bool {
+		return p == oldName
+	})
+	if i == -1 {
+		return fmt.Errorf("cannot edit the project %s. The project doesn't exist", oldName)
+	}
+
+	db.projects[i] = newName
+
+	return nil
+}
+
 func (db *InMemoryDB) GetProjectTranslations(_ context.Context, name string, offset, limit int) ([]domain.Translation, error) {
 	_, ok := db.translations[name]
 	if !ok {

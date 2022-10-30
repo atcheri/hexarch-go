@@ -18,6 +18,7 @@ type ProjectsController struct {
 func AddProjectsRoutes(router *gin.Engine, tc ProjectsController) {
 	group := router.Group("/projects")
 	group.POST("/", tc.PostProjectHandler)
+	group.PUT("/:projectName", tc.PutProjectHandler)
 }
 
 // NewProjectsController is a ProjectsController factory function
@@ -33,7 +34,7 @@ func (lc ProjectsController) PostProjectHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
 			http.StatusBadRequest,
 			"Resource not created",
-			"impossible to create the new project %s",
+			"impossible to create the new project",
 		))
 		return
 	}
@@ -48,4 +49,29 @@ func (lc ProjectsController) PostProjectHandler(c *gin.Context) {
 	}
 
 	c.Status(http.StatusCreated)
+}
+
+func (lc ProjectsController) PutProjectHandler(c *gin.Context) {
+	oldName := c.Param("projectName")
+	var body dto.EditProjectRequestBody
+	if err := c.BindJSON(&body); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not updated",
+			"impossible to edit the project ",
+		))
+		return
+	}
+
+	newName := body.Name
+	if err := lc.projectsRepo.Edit(c, oldName, newName); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not updated",
+			fmt.Sprintf("impossible to edit the new project called %s to %s", oldName, newName),
+		))
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }

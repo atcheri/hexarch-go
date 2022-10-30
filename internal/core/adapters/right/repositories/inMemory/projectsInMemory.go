@@ -19,3 +19,7 @@ func NewInMemoryProjects(db *databases.InMemoryDB) ports.ProjectsRepository {
 func (i inMemoryProjects) Create(ctx context.Context, name string) error {
 	return i.db.CreateProject(ctx, name)
 }
+
+func (i inMemoryProjects) Edit(ctx context.Context, oldName, newName string) error {
+	return i.db.EditProject(ctx, oldName, newName)
+}
