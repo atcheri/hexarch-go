@@ -12,15 +12,18 @@ import (
 )
 
 type appControllers struct {
+	projectsController  routes.ProjectsController
 	languagesController routes.TranslationsController
 }
 
 type AppControllersDependencies struct {
+	ProjectsRepos    ports.ProjectsRepository
 	TranslationsRepo ports.TranslationsRepository
 }
 
 func NewAppControllers(deps AppControllersDependencies) appControllers {
 	return appControllers{
+		projectsController:  routes.NewProjectsController(deps.ProjectsRepos),
 		languagesController: routes.NewTranslationsController(deps.TranslationsRepo),
 	}
 }
@@ -37,6 +40,7 @@ func NewGinApp(controllers appControllers) *gin.Engine {
 	})
 
 	routes.AddTranslationsRoutes(app, controllers.languagesController)
+	routes.AddProjectsRoutes(app, controllers.projectsController)
 
 	app.StaticFS("/api/docs", http.FS(docs.Swagger))
 

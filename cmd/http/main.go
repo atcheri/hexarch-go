@@ -33,9 +33,13 @@ func main() {
 	db := databases.NewInMemoryDB()
 
 	// Initializing repositories
+	projectsRepo := adapters.NewInMemoryProjects(db)
 	translationsRepo := adapters.NewInMemoryTranslations(db)
 
-	app := server.NewGinApp(server.NewAppControllers(server.AppControllersDependencies{TranslationsRepo: translationsRepo}))
+	app := server.NewGinApp(server.NewAppControllers(server.AppControllersDependencies{
+		ProjectsRepos:    projectsRepo,
+		TranslationsRepo: translationsRepo,
+	}))
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%s", port),

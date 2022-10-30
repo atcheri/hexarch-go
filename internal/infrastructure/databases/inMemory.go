@@ -35,6 +35,19 @@ func NewInMemoryDB() *InMemoryDB {
 	}
 }
 
+func (db *InMemoryDB) CreateProject(_ context.Context, name string) error {
+	_, exists := lo.Find[string](db.projects, func(p string) bool {
+		return p == name
+	})
+	if exists {
+		return fmt.Errorf("cannot create the project %s. Project of the same name already exists", name)
+	}
+
+	db.projects = append(db.projects, name)
+
+	return nil
+}
+
 func (db *InMemoryDB) GetProjectTranslations(_ context.Context, name string, offset, limit int) ([]domain.Translation, error) {
 	_, ok := db.translations[name]
 	if !ok {
