@@ -19,21 +19,43 @@ info:
     url: /api/docs/assets/translate-logo.png
     altText: Translation app logo
   tags:
-    - name: organization
+    - name: Organization
       description: |
         Markdown description of the organization tag
-    - name: project
+    - name: Project
       description: |
         Markdown description of the project tag
     - name: Translation
       description: |
         Markdown description of the translation tag
   x-tagGroups:
-    - name: Group 1
+    - name: Translation group
       tags:
         - Translation
 
 paths:
+  /api/projects:
+    post:
+      summary: Create a new Project
+      description: |
+        This endpoint allows you to create a new project that will hold all its translations
+      operationId: postProject
+      requestBody:
+        description: Required data to create a new Project
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectRequestBody"
+      responses:
+        201:
+          $ref: "#/components/responses/CreateProjectResponse"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+      tags:
+        - Project
+
   /api/translations/{projectName}:
     get:
       summary: Get Project translations
@@ -195,6 +217,8 @@ components:
                       - code: pt
                         tect: sobre nós
                 total: 3
+    CreateProjectResponse:
+      description: Response of a created project.
     CreateTranslationResponse:
       description: Response of a created translation.
     EditTranslationResponse:
@@ -252,6 +276,16 @@ components:
           type: string
         text:
           type: string
+    CreateProjectRequestBody:
+      description: The payload body to create a new project
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 20
+          minLength: 1
     CreateProjectTranslationRequestBody:
       description: The payload body to create a translation
       type: object
