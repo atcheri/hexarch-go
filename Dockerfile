@@ -27,6 +27,7 @@ WORKDIR /root/
 
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/http .
+COPY --from=builder /app/internal/core/adapters/right/repositories/inMemory/languages.json ./internal/core/adapters/right/repositories/inMemory/languages.json
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
