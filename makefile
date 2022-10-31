@@ -1,4 +1,4 @@
-.PHONY: build run build-cli lint test codegen
+.PHONY: build run build-cli lint test codegen cross-compile
 
 dependencies:
 	go mod download
@@ -26,3 +26,6 @@ codegen:
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.9.1
 	oapi-codegen -generate types -package dto ./docs/openapi.yaml > ./internal/core/dtos/api_dtos.gen.go
 	oapi-codegen -generate spec -package http ./docs/openapi.yaml > ./internal/core/http/http_spec.gen.go
+
+cross-compile:
+	goreleaser --snapshot --rm-dist

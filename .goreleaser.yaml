@@ -1,0 +1,12 @@
+project_name: github.com/atcheri/hexarch-go
+builds:
+  - id: hexarch-go-http
+    main: ./cmd/http/main.go
+    env:
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64

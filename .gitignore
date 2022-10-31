@@ -32,3 +32,6 @@ logs
 
 # env file
 .env
+
+# build folder
+dist
