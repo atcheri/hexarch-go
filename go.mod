@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/getkin/kin-openapi v0.104.0
 	github.com/gin-gonic/gin v1.8.1
+	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.33.0
 	github.com/spf13/cobra v1.6.0

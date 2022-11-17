@@ -91,7 +91,7 @@ func (db *InMemoryDB) AddProjectTranslation(_ context.Context, name, key, code, 
 		return err
 	}
 
-	newTranslation, _ := domain.NewTranslation(key)
+	newTranslation, _ := domain.NewTranslation(name, key)
 	for _, l := range inMemoryLanguages {
 		textToSave := ""
 		if l == code {
@@ -106,7 +106,20 @@ func (db *InMemoryDB) AddProjectTranslation(_ context.Context, name, key, code, 
 }
 
 // EditProjectTranslation just edits a translation for a given language, key and project
-func (db *InMemoryDB) EditProjectTranslation(_ context.Context, _, name, key, code, text string) error {
+func (db *InMemoryDB) EditProjectTranslation(_ context.Context, id, key, code, text string) error {
+	name := ""
+	for projectName, translations := range db.translations {
+		for _, translation := range translations {
+			if translation.GetKey() == key {
+				name = projectName
+			}
+		}
+	}
+
+	if name == "" {
+		return fmt.Errorf("impossible to edit translation for the key %s. The key doesn't belong to any project", key)
+	}
+
 	translations, err := db.findProjectTranslations(name)
 	if err != nil {
 		return err
@@ -137,7 +150,7 @@ func (db *InMemoryDB) EditProjectTranslation(_ context.Context, _, name, key, co
 
 	newTranslations := make([]domain.Translation, len(translations))
 	copy(newTranslations, translations)
-	newTranslation, _ := domain.NewTranslation(key)
+	newTranslation, _ := domain.NewTranslation(name, key)
 	lo.ForEach[domain.LanguageTranslation](newTranslationLanguages, func(tl domain.LanguageTranslation, index int) {
 		newTranslation = newTranslation.AddTranslation(tl)
 	})
@@ -199,7 +212,7 @@ func createProjectTranslations(names, keys []string, languages []string, transla
 	for _, name := range names {
 		translations := make([]domain.Translation, len(keys))
 		for ki, key := range keys {
-			translation, _ := domain.NewTranslation(key)
+			translation, _ := domain.NewTranslation(name, key)
 			for li, lang := range languages {
 				tv, _ := domain.NewLanguageTranslation(lang, translationCodesAndValues[ki][li])
 				translation = translation.AddTranslation(tv)

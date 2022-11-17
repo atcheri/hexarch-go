@@ -22,6 +22,7 @@ func ToTranslationKeyDTO(t domain.Translation) TranslationKeyDTO {
 		}
 	}
 	return TranslationKeyDTO{
+		Id:        t.GetID(),
 		Key:       t.GetKey(),
 		Languages: languageDTOs,
 	}

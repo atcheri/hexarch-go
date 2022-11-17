@@ -35,10 +35,12 @@ func main() {
 	// Initializing repositories
 	projectsRepo := adapters.NewInMemoryProjects(db)
 	translationsRepo := adapters.NewInMemoryTranslations(db)
+	commentsRepo := adapters.NewInMemoryComments(db)
 
 	app := server.NewGinApp(server.NewAppControllers(server.AppControllersDependencies{
 		ProjectsRepos:    projectsRepo,
 		TranslationsRepo: translationsRepo,
+		CommentsRepo:     commentsRepo,
 	}))
 
 	srv := &http.Server{

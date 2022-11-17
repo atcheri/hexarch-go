@@ -96,7 +96,7 @@ func (lc TranslationsController) PutProjectTranslationHandler(c *gin.Context) {
 	key := body.Key
 	code := body.Code
 	text := body.Text
-	err := lc.translationsRepo.EditForProject(c, id, name, key, code, text)
+	err := lc.translationsRepo.EditForProject(c, id, key, code, text)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
 			http.StatusBadRequest,

@@ -8,3 +8,13 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+#
+#  sqlite3:
+#    image: nouchka/sqlite3:latest
+#    stdin_open: true
+#    tty: true
+#    volumes:
+#      - ./db/:/root/db/
+##    ports:
+##      - '9000:9000'
+#    restart: unless-stopped

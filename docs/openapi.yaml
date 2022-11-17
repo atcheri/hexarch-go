@@ -28,6 +28,9 @@ info:
     - name: Translation
       description: |
         Markdown description of the translation tag
+    - name: Comment
+      description: |
+        Markdown description of the comment tag
   x-tagGroups:
     - name: Translation group
       tags:
@@ -164,7 +167,45 @@ paths:
           $ref: "#/components/responses/InternalServerError"
       tags:
         - Translation
-
+  /api/translation-comments/{translationId}:
+    get:
+      summary: Get Comments for a specific key
+      description: |
+        This endpoint list all the comments for a specific translation key in a project
+      operationId: getTranslationComments
+      parameters:
+        - $ref: "#/components/parameters/TranslationIdParam"
+      responses:
+        200:
+          $ref: "#/components/responses/TranslationCommentsGetResponse"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+      tags:
+        - Comment
+    post:
+      summary: Create a comment for a translation key in a project
+      description: |
+        This endpoint allows you to add a comment to an existing translation key in a project
+      operationId: postComment
+      parameters:
+        - $ref: "#/components/parameters/TranslationIdParam"
+      requestBody:
+        description: Required data to create a new Comment
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTranslationCommentRequestBody"
+      responses:
+        201:
+          $ref: "#/components/responses/CreateTranslationCommentResponse"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+      tags:
+        - Comment
 components:
   parameters:
     ProjectNameParam:
@@ -249,13 +290,44 @@ components:
 #      allOf:
 #        - $ref: "#/components/schemas/CreateTranslationResponse"
     ProjectTranslationsDeleteResponse:
-      description: Response of a delete translation key.
+      description: Response of a deleted translation key.
     BadRequest:
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
       description: BadRequest. Returned when the payload is invalid.
+    TranslationCommentsGetResponse:
+      description: Get the comments for a given translation key in a project
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - comments
+              - total
+            properties:
+              translations:
+                description: The list of comments
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentDTO"
+              total:
+                description: The total amount of comments for the translation key
+                type: integer
+          examples:
+            Successful response:
+              value:
+                comments:
+                  - userId: 25
+                    text: What do you think about adding the italian translation?
+                    createdAt: 2022-02-25T22:05:54.973Z
+                  - userId: 47
+                    text: I don't think. I'm having a coffee
+                    createdAt: 2022-02-26T22:10:14.973Z
+                total: 2
+    CreateTranslationCommentResponse:
+      description: Response of a created translation key's comment.
     NotFound:
       description: Returned when the requested ressource was not found.
       content:
@@ -278,9 +350,12 @@ components:
     TranslationKeyDTO:
       type: object
       required:
+        - id
         - key
         - languages
       properties:
+        id:
+          type: string
         key:
           type: string
           maxLength: 20
@@ -299,6 +374,20 @@ components:
           type: string
         text:
           type: string
+    CommentDTO:
+      type: object
+      required:
+        - userId
+        - text
+        - createdAt
+      properties:
+        userId:
+          type: string
+        text:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
     CreateProjectRequestBody:
       description: The payload body to create a new project
       type: object
@@ -337,6 +426,17 @@ components:
         - key
       properties:
         key:
+          type: string
+    CreateTranslationCommentRequestBody:
+      description: The payload body to create a comment for a translation key
+      type: object
+      required:
+        - userId
+        - text
+      properties:
+        userId:
+          type: string
+        text:
           type: string
     Error:
       description: Standard Error response.

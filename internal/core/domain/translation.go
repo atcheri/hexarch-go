@@ -3,18 +3,24 @@ package domain
 import (
 	"fmt"
 
+	"github.com/nu7hatch/gouuid"
 	"github.com/pkg/errors"
 )
 
 // Translation is a struct that contains the key and the different language translations
 type Translation struct {
+	id                   string
+	projectID            string
 	key                  string
 	languageTranslations []LanguageTranslation
 }
 
-func NewTranslation(key string) (Translation, error) {
+func NewTranslation(projectID, key string) (Translation, error) {
 	// validate key here
+	uniqID, _ := uuid.NewV4()
 	return Translation{
+		id:                   uniqID.String(),
+		projectID:            projectID,
 		key:                  key,
 		languageTranslations: make([]LanguageTranslation, 0),
 	}, nil
@@ -22,9 +28,19 @@ func NewTranslation(key string) (Translation, error) {
 
 func (t Translation) AddTranslation(l LanguageTranslation) Translation {
 	return Translation{
+		id:                   t.GetID(),
+		projectID:            t.GetProjectID(),
 		key:                  t.key,
 		languageTranslations: append(t.languageTranslations, l),
 	}
+}
+
+func (t Translation) GetID() string {
+	return t.id
+}
+
+func (t Translation) GetProjectID() string {
+	return t.projectID
 }
 
 func (t Translation) GetKey() string {
