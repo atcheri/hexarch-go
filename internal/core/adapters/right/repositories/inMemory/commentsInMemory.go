@@ -17,16 +17,15 @@ func NewInMemoryComments(db *databases.InMemoryDB) ports.CommentsRepository {
 	return inMemoryComments{db: db}
 }
 
-func (i inMemoryComments) GetAll(ctx context.Context, key string) ([]domain.Comment, error) {
-	return i.db.GetTranslationComments(ctx, key)
+func (i inMemoryComments) GetAll(ctx context.Context, id string) ([]domain.Comment, error) {
+	return i.db.GetTranslationComments(ctx, id)
 }
 
-func (i inMemoryComments) Add(ctx context.Context, key, content string) error {
-	//TODO implement me
-	panic("implement me")
+func (i inMemoryComments) Add(ctx context.Context, id, userID, text string) error {
+	return i.db.AddProjectTranslationComment(ctx, id, userID, text)
 }
 
-func (i inMemoryComments) Edit(ctx context.Context, key, content string) error {
+func (i inMemoryComments) Edit(ctx context.Context, id, userID, text string) error {
 	//TODO implement me
 	panic("implement me")
 }

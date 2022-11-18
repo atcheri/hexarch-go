@@ -43,7 +43,7 @@ func (lc ProjectsController) PostProjectHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
 			http.StatusBadRequest,
 			"Resource not created",
-			fmt.Sprintf("impossible to create a new the new project called %s", body.Name),
+			fmt.Sprintf("impossible to create a new project called %s", body.Name),
 		))
 		return
 	}

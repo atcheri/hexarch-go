@@ -21,6 +21,10 @@ func (i inMemoryTranslations) GetForProject(ctx context.Context, name string, of
 	return i.db.GetProjectTranslations(ctx, name, offset, limit)
 }
 
+func (i inMemoryTranslations) GetOneForProject(ctx context.Context, id string) (domain.Translation, error) {
+	return i.db.GetProjectTranslation(ctx, id)
+}
+
 func (i inMemoryTranslations) AddForProject(ctx context.Context, name, key, code, text string) error {
 	return i.db.AddProjectTranslation(ctx, name, key, code, text)
 }

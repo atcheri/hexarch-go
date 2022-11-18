@@ -30,7 +30,7 @@ func NewAppControllers(deps AppControllersDependencies) appControllers {
 	return appControllers{
 		projectsController:  routes.NewProjectsController(deps.ProjectsRepos),
 		languagesController: routes.NewTranslationsController(deps.TranslationsRepo),
-		commentsController:  routes.NewCommentsController(deps.CommentsRepo),
+		commentsController:  routes.NewCommentsController(deps.CommentsRepo, deps.TranslationsRepo),
 	}
 }
 

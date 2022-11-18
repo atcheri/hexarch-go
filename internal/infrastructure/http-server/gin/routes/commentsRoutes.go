@@ -15,7 +15,8 @@ import (
 
 // CommentsController is the controller for the projects route
 type CommentsController struct {
-	commentsRepo ports.CommentsRepository
+	commentsRepo     ports.CommentsRepository
+	translationdRepo ports.TranslationsRepository
 }
 
 // AddCommentsRoutes adds the routes to the comments endpoint
@@ -27,9 +28,10 @@ func AddCommentsRoutes(apiGroup *gin.RouterGroup, c CommentsController) {
 }
 
 // NewCommentsController is a CommentsController factory function
-func NewCommentsController(repo ports.CommentsRepository) CommentsController {
+func NewCommentsController(commentsRepo ports.CommentsRepository, translationRepo ports.TranslationsRepository) CommentsController {
 	return CommentsController{
-		commentsRepo: repo,
+		commentsRepo:     commentsRepo,
+		translationdRepo: translationRepo,
 	}
 }
 
@@ -56,5 +58,35 @@ func (ctrl *CommentsController) GetCommentsHandler(c *gin.Context) {
 
 // PostCommentHandler is the POST comments handler function
 func (ctrl *CommentsController) PostCommentHandler(c *gin.Context) {
-	panic("to implement")
+	id := c.Param("translationId")
+	var body dto.CreateTranslationCommentRequestBody
+	if err := c.BindJSON(&body); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not created",
+			"impossible to create a new comment",
+		))
+		return
+	}
+
+	_, err := ctrl.translationdRepo.GetOneForProject(c, id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"error_type": http.StatusText(http.StatusNotFound),
+			"name":       "Resource not found",
+			"message":    errors.Wrap(err, fmt.Sprintf("the comment was not found for this translation: %s", id)),
+		})
+	}
+
+	err = ctrl.commentsRepo.Add(c, id, body.UserId, body.Text)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, buildGinErrorJSON(
+			http.StatusBadRequest,
+			"Resource not created",
+			fmt.Sprintf("impossible to create a new comment for the translation %s", id),
+		))
+		return
+	}
+
+	c.Status(http.StatusCreated)
 }

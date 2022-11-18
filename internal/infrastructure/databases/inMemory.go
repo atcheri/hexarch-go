@@ -100,6 +100,31 @@ func (db *InMemoryDB) GetProjectTranslations(_ context.Context, name string, off
 	return translations, nil
 }
 
+// GetProjectTranslation gets a specific translation in a project
+func (db *InMemoryDB) GetProjectTranslation(_ context.Context, id string) (domain.Translation, error) {
+	name, err := db.findProjectNameFromPredicate(id, func(t domain.Translation) bool {
+		return t.GetID() == id
+	})
+
+	if err != nil {
+		return domain.Translation{}, err
+	}
+
+	translations, err := db.findProjectTranslations(name)
+	if err != nil {
+		return domain.Translation{}, err
+	}
+
+	translation, ok := lo.Find[domain.Translation](translations, func(t domain.Translation) bool {
+		return t.GetID() == id
+	})
+	if !ok {
+		return domain.Translation{}, fmt.Errorf("couldn't find the translation for the id %s", id)
+	}
+
+	return translation, nil
+}
+
 func (db *InMemoryDB) AddProjectTranslation(_ context.Context, name, key, code, text string) error {
 	translations, err := db.findProjectTranslationsForKey(name, key)
 	if err != nil {
@@ -120,19 +145,20 @@ func (db *InMemoryDB) AddProjectTranslation(_ context.Context, name, key, code, 
 	return nil
 }
 
-// EditProjectTranslation just edits a translation for a given language, key and project
-func (db *InMemoryDB) EditProjectTranslation(_ context.Context, id, key, code, text string) error {
-	name := ""
-	for projectName, translations := range db.translations {
-		for _, translation := range translations {
-			if translation.GetKey() == key {
-				name = projectName
-			}
-		}
-	}
+// AddProjectTranslationComment adds a comment to an existing translation
+func (db *InMemoryDB) AddProjectTranslationComment(_ context.Context, id, userID, text string) error {
+	db.comments = append(db.comments, domain.NewComment(userID, id, text))
 
-	if name == "" {
-		return fmt.Errorf("impossible to edit translation for the key %s. The key doesn't belong to any project", key)
+	return nil
+}
+
+// EditProjectTranslation just edits a translation for a given language, key and project
+func (db *InMemoryDB) EditProjectTranslation(_ context.Context, _, key, code, text string) error {
+	name, err := db.findProjectNameFromPredicate(key, func(t domain.Translation) bool {
+		return t.GetKey() == key
+	})
+	if err != nil {
+		return err
 	}
 
 	translations, err := db.findProjectTranslations(name)
@@ -227,6 +253,23 @@ func (db *InMemoryDB) findProjectTranslations(name string) ([]domain.Translation
 	}
 
 	return translations, nil
+}
+
+func (db *InMemoryDB) findProjectNameFromPredicate(param string, predicate func(t domain.Translation) bool) (string, error) {
+	name := ""
+	for projectName, translations := range db.translations {
+		for _, translation := range translations {
+			if predicate(translation) {
+				name = projectName
+			}
+		}
+	}
+
+	if name == "" {
+		return "", fmt.Errorf("impossible to edit translation for the param %s. The key doesn't belong to any project", param)
+	}
+
+	return name, nil
 }
 
 func createProjectTranslations(names, keys []string, languages []string, translationCodesAndValues [][]string) projectTranslationsType {
