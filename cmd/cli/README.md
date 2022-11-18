@@ -1,3 +1,6 @@
+### Add here cobra related code
+
+```go
 package main
 
 import (
@@ -7,3 +10,5 @@ import (
 func main() {
 	cli.Execute()
 }
+
+```

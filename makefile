@@ -6,10 +6,10 @@ dependencies:
 build:
 	go build \
 		-o ./out/app \
-		cmd/http/main.go
+		cmd/main.go
 
 run:
-	go run cmd/http/main.go
+	go run cmd/main.go
 
 build-cli:
 	go build \
@@ -29,3 +29,9 @@ codegen:
 
 cross-compile:
 	goreleaser --snapshot --rm-dist
+
+docker-build:
+	docker build -t hexarch-go .
+
+docker-run:
+	docker run --name hexarch-go-server -d --restart=always -p 8080:8080 hexarch-go

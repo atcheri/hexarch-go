@@ -18,7 +18,7 @@ COPY . .
 RUN ls -la
 
 # Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux go build -o http ./cmd/http/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o http ./cmd/main.go
 
 ######## Start a new stage from scratch #######
 FROM scratch
