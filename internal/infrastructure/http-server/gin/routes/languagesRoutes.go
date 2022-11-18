@@ -46,11 +46,11 @@ func (lc TranslationsController) GetAllHandler(c *gin.Context) {
 			"message":    errors.Wrap(err, fmt.Sprintf("the translations were not found for this project: %s", name)),
 		})
 	}
-	dots := dto.ToTranslationKeyDTOs(translations)
+	dtos := dto.ToTranslationKeyDTOs(translations)
 	c.JSON(http.StatusOK, gin.H{
-		"translations": dots,
+		"translations": dtos,
 		// TODO: we need to calculate the total translations for the project
-		"total": len(dots),
+		"total": len(dtos),
 	})
 }
 

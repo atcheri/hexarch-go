@@ -18,8 +18,7 @@ func NewInMemoryComments(db *databases.InMemoryDB) ports.CommentsRepository {
 }
 
 func (i inMemoryComments) GetAll(ctx context.Context, key string) ([]domain.Comment, error) {
-	//TODO implement me
-	panic("implement me")
+	return i.db.GetTranslationComments(ctx, key)
 }
 
 func (i inMemoryComments) Add(ctx context.Context, key, content string) error {

@@ -1,3 +1,4 @@
+// Package main contains the main http, cli and graphql bootstrap code
 package main
 
 import (

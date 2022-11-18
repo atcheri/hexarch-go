@@ -3,7 +3,10 @@ package databases
 import (
 	"context"
 	"fmt"
+	"math/rand"
 
+	"github.com/go-faker/faker/v4"
+	uuid "github.com/nu7hatch/gouuid"
 	"github.com/samber/lo"
 
 	"github.com/atcheri/hexarch-go/internal/core/domain"
@@ -16,22 +19,34 @@ var (
 
 type projectTranslationsType map[string][]domain.Translation
 
+// InMemoryDB as it's name indicates, is a in memory database
 type InMemoryDB struct {
 	projects     []string
 	translations projectTranslationsType
+	comments     []domain.Comment
 }
 
 // NewInMemoryDB is the factory function for a InMemoryDB struct
 func NewInMemoryDB() *InMemoryDB {
-	translations := createProjectTranslations(inMemoryProjects, []string{"home", "contact", "about-us"}, []string{"en", "fr", "pt", "jp"}, [][]string{
+	projectTranslations := createProjectTranslations(inMemoryProjects, []string{"home", "contact", "about-us"}, []string{"en", "fr", "pt", "jp"}, [][]string{
 		{"home", "accueil", "casa", "ホーム"},
 		{"contact", "contact", "contato", "問い合わせ"},
 		{"about us", "à propos", "sobre nós", "会社概要"},
 	})
 
+	ids := make([]string, 0)
+	for _, translations := range projectTranslations {
+		for _, translation := range translations {
+			ids = append(ids, translation.GetID())
+		}
+	}
+
+	comments := createTranslationComments(ids)
+
 	return &InMemoryDB{
 		projects:     inMemoryProjects,
-		translations: translations,
+		translations: projectTranslations,
+		comments:     comments,
 	}
 }
 
@@ -182,6 +197,13 @@ func (db *InMemoryDB) DeleteByKey(_ context.Context, name, key string) error {
 
 }
 
+// GetTranslationComments filters and only keeps comments that belong to a specific translation-id
+func (db *InMemoryDB) GetTranslationComments(_ context.Context, id string) ([]domain.Comment, error) {
+	return lo.Filter[domain.Comment](db.comments, func(c domain.Comment, _ int) bool {
+		return c.GetTranslationID() == id
+	}), nil
+}
+
 func (db *InMemoryDB) findProjectTranslationsForKey(name, key string) ([]domain.Translation, error) {
 	translations, err := db.findProjectTranslations(name)
 	if err != nil {
@@ -223,4 +245,17 @@ func createProjectTranslations(names, keys []string, languages []string, transla
 	}
 
 	return t
+}
+
+func createTranslationComments(ids []string) []domain.Comment {
+	comments := make([]domain.Comment, 0)
+	for _, id := range ids {
+		randomCount := rand.Intn(5) + 1
+		for i := 0; i < randomCount; i++ {
+			uniqID, _ := uuid.NewV4()
+			comments = append(comments, domain.NewComment(uniqID.String(), id, faker.Sentence()))
+		}
+	}
+
+	return comments
 }
