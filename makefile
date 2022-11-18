@@ -6,15 +6,15 @@ dependencies:
 build:
 	go build \
 		-o ./out/app \
-		cmd/main.go
+		./cmd/main.go
 
 run:
-	go run cmd/main.go
+	go run ./cmd/main.go
 
 build-cli:
 	go build \
 		-o ./out/cli \
-		cmd/cli/main.go
+		./cmd/cli/main.go
 
 lint:
 	golangci-lint run --issues-exit-code 0 --out-format code-climate | jq -c '.[] | select(.severity|contains("major"))'
