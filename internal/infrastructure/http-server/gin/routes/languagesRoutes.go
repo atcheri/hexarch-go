@@ -17,13 +17,14 @@ type TranslationsController struct {
 }
 
 // AddTranslationsRoutes adds the routes to the translations endpoint
-func AddTranslationsRoutes(router *gin.Engine, tc TranslationsController) {
-	group := router.Group("/translations/:projectName")
+func AddTranslationsRoutes(apiGroup *gin.RouterGroup, tc TranslationsController) {
+	group := apiGroup.Group("/translations/:projectName")
 	group.GET("/", tc.GetAllHandler)
 	group.POST("/", tc.PostProjectTranslationHandler)
 	group.DELETE("/", tc.DeleteProjectTranslationHandler)
 
 	group.PUT("/:translationId", tc.PutProjectTranslationHandler)
+
 }
 
 // NewTranslationsController is a TranslationsController factory function

@@ -1,3 +1,4 @@
+// Package server wires up the Gin framework dependencies
 package server
 
 import (
@@ -17,12 +18,14 @@ type appControllers struct {
 	commentsController  routes.CommentsController
 }
 
+// AppControllersDependencies lists up the controller dependencies, mostly repositories
 type AppControllersDependencies struct {
 	ProjectsRepos    ports.ProjectsRepository
 	TranslationsRepo ports.TranslationsRepository
 	CommentsRepo     ports.CommentsRepository
 }
 
+// NewAppControllers is the AppController factory function
 func NewAppControllers(deps AppControllersDependencies) appControllers {
 	return appControllers{
 		projectsController:  routes.NewProjectsController(deps.ProjectsRepos),
@@ -31,20 +34,18 @@ func NewAppControllers(deps AppControllersDependencies) appControllers {
 	}
 }
 
+// NewGinApp sets up the Gin engine
 func NewGinApp(controllers appControllers) *gin.Engine {
 	app := gin.Default()
-	app.GET("/", func(c *gin.Context) {
-		time.Sleep(5 * time.Second)
-		c.String(http.StatusOK, "Welcome Gin Server")
-	})
 
 	app.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"date": time.Now().String()})
 	})
 
-	routes.AddTranslationsRoutes(app, controllers.languagesController)
-	routes.AddProjectsRoutes(app, controllers.projectsController)
-	routes.AddCommentsRoutes(app, controllers.commentsController)
+	apiGroup := app.Group("/api")
+	routes.AddTranslationsRoutes(apiGroup, controllers.languagesController)
+	routes.AddProjectsRoutes(apiGroup, controllers.projectsController)
+	routes.AddCommentsRoutes(apiGroup, controllers.commentsController)
 
 	app.StaticFS("/api/docs", http.FS(docs.Swagger))
 

@@ -15,8 +15,8 @@ type ProjectsController struct {
 }
 
 // AddProjectsRoutes adds the routes to the projects endpoint
-func AddProjectsRoutes(router *gin.Engine, tc ProjectsController) {
-	group := router.Group("/projects")
+func AddProjectsRoutes(apiGroup *gin.RouterGroup, tc ProjectsController) {
+	group := apiGroup.Group("/projects")
 	group.POST("/", tc.PostProjectHandler)
 	group.PUT("/:projectName", tc.PutProjectHandler)
 }

@@ -19,8 +19,8 @@ type CommentsController struct {
 }
 
 // AddCommentsRoutes adds the routes to the comments endpoint
-func AddCommentsRoutes(router *gin.Engine, c CommentsController) {
-	group := router.Group("/translation-comments/:translationId")
+func AddCommentsRoutes(apiGroup *gin.RouterGroup, c CommentsController) {
+	group := apiGroup.Group("/translation-comments/:translationId")
 	group.GET("/", c.GetCommentsHandler)
 	group.POST("/", c.PostCommentHandler)
 	//group.PUT("/:commentID", c.PutCommentHandler)
